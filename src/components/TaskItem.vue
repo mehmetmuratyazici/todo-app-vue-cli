@@ -1,20 +1,41 @@
 <template>
-    <li :key="item.id" v-for="item in tasks" class="list-group-item d-flex justify-content-between align-items-center">
-              <span>{{item.name}}</span>
-              <button @click="deleteTask(item)" class="btn btn-danger">Sil</button>
-    </li>
+  <li
+    :key="item.id"
+    v-for="item in tasks"
+    class="list-group-item d-flex justify-content-between align-items-center"
+  >
+    <input
+      :key="`chk_+${item.id}`"
+      type="checkbox"
+      class="form-check-input"
+      :checked="item.isComplate"
+      @change="changeStatus(item.id, item, $event)"
+    />
+    <span>{{ item.task || item.id }}</span>
+    <button :key="`btn_+${item.id}`" :disabled="item.isComplate" @click="deleteTask(item)" class="btn btn-danger">Sil</button>
+  </li>
 </template>
 
 <script>
 export default {
-    props: [
-        "tasks"
-    ],
-    methods: {
-        deleteTask(item){
-             //this.tasks = this.tasks.filter(i => i != item);
-             this.$emit("delete-task", item)
-        }    
-    }
-}
+  props: ["tasks"],
+  data() {
+    return {
+      chkComplate: false,
+    };
+  },
+  methods: {
+    changeStatus(key, item, event) {
+      item.isComplate = event.target.checked
+      this.$emit("change-status",key ,event.target.checked)
+
+    },
+    deleteTask(item) {
+      console.log("deleteTask")
+      //this.tasks = this.tasks.filter(i => i != item);
+      this.$emit("delete-task", item);
+    },
+  },
+  computed: {},
+};
 </script>

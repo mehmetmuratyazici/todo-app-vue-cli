@@ -4,12 +4,13 @@
     <div class="container-md">
       <AddTask @add-Task="addTask"/>
       <hr>
-      <TaskItems @delete-task="deleteTask" :taskList="tasks"/>
+      <TaskItems @change-status="changeStatus" @delete-task="deleteTask" :taskList="tasks"/>
     </div>
     
 </template>
 
 <script>
+import axios from 'axios'
 import TaskItems from "@/components/TaskItems"
 import AddTask from "@/components/AddTask"
 export default {
@@ -20,32 +21,62 @@ export default {
   data() {
     return {
         task : "",
-        tasks : [
-          {
-            id:1,
-            name: "Todo App complated", 
-            createAt : new Date().getTime(),
-            isComplete : false
-          },
-        ],
+        tasks : [ ],
     }
   },
   methods: {
     addTask(event){
-        this.task = event.target.value;
-        this.tasks.push(
-          {
-            id: this.tasks.length+1,
-            name:event.target.value,
-            createAt: new Date().getTime(),
-            isComplete : false,
+        var item = {
+            task: event.target.value,
+            authour:"mmy",
+            isComplate: false,
+            createAt: new Date().getTime()
           }
-        );
+        axios
+        .post(this.firebaseUrl+"/todos.json", item)
+        .then(res => {
+          if(res.status == 200)
+          {
+            item.id = res.data.name
+            this.tasks.push(item)
+          }
+        })
+
         event.target.value = ""
     },
+    changeStatus(key, val){
+        axios
+        .patch(this.firebaseUrl+"/todos/"+ key +".json", {isComplate : val})
+        .then(res => {
+          if(res.status == 200){
+              console.log(res)
+          }
+        })
+    },
     deleteTask(item){
-      this.tasks = this.tasks.filter(i => i != item);
+      axios
+      .delete(this.firebaseUrl+"/todos/"+item.id+".json")
+      .then(res => {
+        if(res.status == 200)
+          this.tasks = this.tasks.filter(i => i != item);
+
+      })
+    },
+    updateStatus(item){
+      axios
+      .patch(this.firebaseUrl+"/todos/"+item.id+".json")
     }
+  },
+  created() {
+    axios
+        .get(this.firebaseUrl+"/todos.json")
+        .then(res => {
+            for(let key in res.data){
+              res.data[key].id = key
+              this.tasks.push(res.data[key])
+            }
+        })
+        .catch()
   },
 }
 </script>

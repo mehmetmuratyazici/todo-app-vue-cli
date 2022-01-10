@@ -1,6 +1,6 @@
 <template>
-    <ul class="list-group">
-         <TaskItem @delete-task="deleteTask" :tasks="taskList"/>   
+    <ul class="list-group" >
+         <TaskItem @change-status="changeStatus" @delete-task="deleteTask" :tasks="taskList" />   
     </ul>
 </template>
 
@@ -14,6 +14,10 @@ export default {
     methods:{
         deleteTask(item){
             this.$emit("delete-task",item)
+        },
+        changeStatus(key,val){
+            console.log(key,val)
+            this.$emit("change-status", key, val)
         }
     }
 }
