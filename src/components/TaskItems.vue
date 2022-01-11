@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group" >
-         <TaskItem @change-status="changeStatus" @delete-task="deleteTask" :tasks="taskList" />   
+         <TaskItem @delete-task="deleteTask" />   
     </ul>
 </template>
 

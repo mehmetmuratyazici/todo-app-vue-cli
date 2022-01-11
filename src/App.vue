@@ -4,9 +4,8 @@
     <div class="container-md">
       <AddTask @add-Task="addTask"/>
       <hr>
-      <TaskItems @change-status="changeStatus" @delete-task="deleteTask" :taskList="tasks"/>
+      <TaskItems @delete-task="deleteTask" />
     </div>
-    
 </template>
 
 <script>
@@ -18,10 +17,18 @@ export default {
     TaskItems,
     AddTask,
   },
+  provide(){
+    return {
+      provideData : this.provideData,
+      changeStatus : this.changeStatus
+    }
+  },
   data() {
     return {
         task : "",
-        tasks : [ ],
+        provideData : {
+          tasks : [ ],
+        }
     }
   },
   methods: {
@@ -38,7 +45,7 @@ export default {
           if(res.status == 200)
           {
             item.id = res.data.name
-            this.tasks.push(item)
+            this.provideData.tasks.push(item)
           }
         })
 
@@ -58,7 +65,7 @@ export default {
       .delete(this.firebaseUrl+"/todos/"+item.id+".json")
       .then(res => {
         if(res.status == 200)
-          this.tasks = this.tasks.filter(i => i != item);
+          this.provideData.tasks = this.provideData.tasks.filter(i => i != item);
 
       })
     },
@@ -73,7 +80,7 @@ export default {
         .then(res => {
             for(let key in res.data){
               res.data[key].id = key
-              this.tasks.push(res.data[key])
+              this.provideData.tasks.push(res.data[key])
             }
         })
         .catch()
